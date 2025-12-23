@@ -1,0 +1,37 @@
+services:
+  backend:
+    build: ./Backend
+    ports:
+      - "5000:5000"
+    environment:
+      - MONGO_URL=mongodb://mongo:27017/DBSS
+      - REDIS_HOST=redis
+    depends_on:
+      - mongo
+      - redis
+    volumes:
+      - ./Backend/uploads:/app/uploads
+      - ./Backend/thumbnails:/app/thumbnails
+      - ./Backend/video-thumbnails:/app/video-thumbnails
+
+  frontend:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_BACKEND_URL=http://localhost:5000
+    depends_on:
+      - backend
+
+  mongo:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+  redis:
+    image: redis:alpine
+
+volumes:
+  mongo-data:
